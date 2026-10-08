@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ p.name }} | {{ p.title }}</title>
+  <meta name="description" content="{{ p.name }} – {{ p.title }}. 1.6+ years training in Data Analytics, Machine Learning and Generative AI (RAG, LangChain, LLMs).">
+  <meta name="keywords" content="Aditya Shinde, Data Scientist, Generative AI Trainer, Python, SQL, Power BI, RAG, LangChain, Machine Learning, Pune">
+  <meta property="og:title" content="{{ p.name }} | {{ p.title }}">
+  <meta property="og:description" content="{{ p.intro }}">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="{{ url_for('static', filename='images/profile.jpg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <!-- Animated background blobs (pure CSS, lightweight) -->
+  <div class="bg" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span></div>
+
+  <!-- 1. NAVBAR -->
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a href="#home" class="logo">{{ p.name.split()[0] }}<span>.</span></a>
+      <button class="burger" id="burger" aria-label="Toggle menu" aria-expanded="false"><i></i><i></i><i></i></button>
+      <nav id="menu" class="menu" aria-label="Main">
+        {% for s in ["Home","About","Skills","Experience","Projects","Education","Contact"] %}
+        <a href="#{{ s|lower }}">{{ s }}</a>
+        {% endfor %}
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- 2. HERO -->
+    <section id="home" class="hero">
+      <div class="container hero-grid">
+        <div class="hero-text">
+          <p class="eyebrow fade" style="--d:.1s">Welcome to my portfolio</p>
+          <h1 class="fade" style="--d:.2s">Hi, I'm <span class="grad">{{ p.name }}</span></h1>
+          <h2 class="fade" style="--d:.3s">{{ p.title }}</h2>
+          <p class="typing fade" style="--d:.4s">I'm a <span id="typed" data-roles='{{ p.roles|tojson }}'></span><span class="cursor">|</span></p>
+          <p class="lead fade" style="--d:.5s">{{ p.intro }}</p>
+          <div class="btns fade" style="--d:.6s">
+            <a href="#projects" class="btn primary">View My Work</a>
+            <a href="{{ url_for('static', filename=p.resume_file) }}" class="btn ghost" download>Download Resume</a>
+          </div>
+        </div>
+        <div class="hero-photo fade" style="--d:.4s">
+          <div class="ring"></div>
+          <img src="{{ url_for('static', filename='images/profile.jpg') }}" alt="Portrait of {{ p.name }}" width="400" height="400">
+          <span class="chip c1">Python</span><span class="chip c2">GenAI</span><span class="chip c3">Power BI</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. ABOUT -->
+    <section id="about" class="section">
+      <div class="container">
+        <h2 class="title reveal">About <span class="grad">Me</span></h2>
+        <div class="two reveal">
+          <div>
+            <p>{{ p.summary }}</p>
+            <p>{{ p.focus }}</p>
+            <ul class="facts">
+              <li><b>Role:</b> Data Science &amp; Generative AI Trainer, UV Technocrats &amp; Solutions</li>
+              <li><b>Education:</b> {{ p.education[0].degree }} ({{ p.education[0].year }})</li>
+              <li><b>Focus:</b> Data Analytics, Machine Learning, Generative AI</li>
+              <li><b>Location:</b> {{ p.location }}</li>
+            </ul>
+          </div>
+          <div class="stats">
+            {% for n, l in p.stats %}<div class="card stat"><strong>{{ n }}</strong><span>{{ l }}</span></div>{% endfor %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. SKILLS -->
+    <section id="skills" class="section alt">
+      <div class="container">
+        <h2 class="title reveal">Technical <span class="grad">Skills</span></h2>
+        <div class="grid3">
+          {% for cat, items in p.skills.items() %}
+          <div class="card reveal">
+            <h3>{{ cat }}</h3>
+            <div class="badges">{% for s in items %}<span class="badge">{{ s }}</span>{% endfor %}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. EXPERIENCE -->
+    <section id="experience" class="section">
+      <div class="container">
+        <h2 class="title reveal">Work <span class="grad">Experience</span></h2>
+        <div class="timeline">
+          {% for e in p.experience %}
+          <article class="t-item reveal">
+            <span class="dot"></span>
+            <div class="card">
+              <span class="date">{{ e.duration }}</span>
+              <h3>{{ e.role }}</h3>
+              <p class="org">{{ e.company }}</p>
+              <ul>{% for pt in e.points %}<li>{{ pt }}</li>{% endfor %}</ul>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 & 8. PROJECTS + FILTER -->
+    <section id="projects" class="section alt">
+      <div class="container">
+        <h2 class="title reveal">Featured <span class="grad">Projects</span></h2>
+        <div class="filters reveal" role="group" aria-label="Filter projects">
+          {% for c in categories %}<button class="filter{% if loop.first %} active{% endif %}" data-filter="{{ c }}">{{ c }}</button>{% endfor %}
+        </div>
+        <div class="grid3">
+          {% for pr in p.projects %}
+          <article class="card project reveal" data-cat="{{ pr.category }}">
+            <div class="visual"><span>{{ pr.icon }}</span><small>{{ pr.tech[:2]|join(' · ') }}</small></div>
+            <span class="tag">{{ pr.category }}</span>
+            <h3>{{ pr.name }}</h3>
+            <p>{{ pr.desc }}</p>
+            <ul>{% for f in pr.features %}<li>{{ f }}</li>{% endfor %}</ul>
+            <div class="badges">{% for t in pr.tech %}<span class="badge sm">{{ t }}</span>{% endfor %}</div>
+            <!-- Add "github" / "demo" keys in app.py and a button here once you have real project links -->
+            <a href="{{ p.github }}" target="_blank" rel="noopener" class="btn primary sm">View on GitHub</a>
+          </article>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. EDUCATION -->
+    <section id="education" class="section">
+      <div class="container">
+        <h2 class="title reveal">My <span class="grad">Education</span></h2>
+        <div class="timeline">
+          {% for e in p.education %}
+          <article class="t-item reveal">
+            <span class="dot"></span>
+            <div class="card">
+              <span class="date">{{ e.year }}</span>
+              <h3>{{ e.degree }}</h3>
+              <p class="org">{{ e.school }}</p>
+              <p><b>Score:</b> {{ e.score }}</p>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. HIGHLIGHTS -->
+    <section id="highlights" class="section alt">
+      <div class="container">
+        <h2 class="title reveal">Career <span class="grad">Highlights</span></h2>
+        <div class="grid3">
+          {% for ic, t, d in p.highlights %}
+          <div class="card center reveal"><div class="big">{{ ic }}</div><h3>{{ t }}</h3><p>{{ d }}</p></div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. RESUME -->
+    <section id="resume" class="section">
+      <div class="container center reveal">
+        <h2 class="title">My <span class="grad">Resume</span></h2>
+        <p class="lead">Get the full details of my experience, skills and projects.</p>
+        <div class="btns jc">
+          <a href="{{ url_for('static', filename=p.resume_file) }}" class="btn primary" download>Download My Resume</a>
+          <a href="{{ url_for('static', filename=p.resume_file) }}" class="btn ghost" target="_blank" rel="noopener">View Resume</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. CONTACT -->
+    <section id="contact" class="section alt">
+      <div class="container">
+        <h2 class="title reveal">Get In <span class="grad">Touch</span></h2>
+        <div class="two reveal">
+          <div class="info">
+            <p><b>Email</b><br><a href="mailto:{{ p.email }}">{{ p.email }}</a></p>
+            <p><b>Phone</b><br><a href="tel:+91{{ p.phone }}">{{ p.phone }}</a></p>
+            <p><b>Location</b><br>{{ p.location }}</p>
+            <div class="social">
+              <a href="{{ p.linkedin }}" target="_blank" rel="noopener">LinkedIn</a>
+              <a href="{{ p.github }}" target="_blank" rel="noopener">GitHub</a>
+            </div>
+          </div>
+          <!-- No server-side email is implemented: on submit the form opens the visitor's email app (mailto). -->
+          <form id="form" class="card" novalidate>
+            <label>Name<input name="name" required minlength="2"><small class="err"></small></label>
+            <label>Email<input name="email" type="email" required><small class="err"></small></label>
+            <label>Subject<input name="subject" required minlength="3"><small class="err"></small></label>
+            <label>Message<textarea name="message" rows="5" required minlength="10"></textarea><small class="err"></small></label>
+            <button class="btn primary" type="submit">Send Message</button>
+            <p class="note" id="note" role="status"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 14. FOOTER -->
+  <footer class="footer">
+    <div class="container foot">
+      <p>© <span id="year">2026</span> {{ p.name }}. All Rights Reserved.</p>
+      <div class="social">
+        <a href="{{ p.linkedin }}" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="{{ p.github }}" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+  <button id="top" class="top" aria-label="Back to top">↑</button>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
